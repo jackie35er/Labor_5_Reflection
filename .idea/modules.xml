@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Reflection.main.iml" filepath="$PROJECT_DIR$/.idea/modules/Reflection.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Reflection.test.iml" filepath="$PROJECT_DIR$/.idea/modules/Reflection.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/org.jackie35er.Reflection.test.iml" filepath="$PROJECT_DIR$/.idea/modules/org.jackie35er.Reflection.test.iml" />
     </modules>
   </component>
 </project>

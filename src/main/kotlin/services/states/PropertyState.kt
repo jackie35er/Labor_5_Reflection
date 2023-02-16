@@ -1,11 +1,9 @@
 package services.states
 
+import services.ReflectionUtils
 import services.XmlSerializer
 import kotlin.reflect.full.declaredMemberProperties
-import kotlin.reflect.full.functions
-import kotlin.reflect.full.isSubclassOf
-import kotlin.reflect.full.valueParameters
-import kotlin.reflect.jvm.*
+import kotlin.reflect.jvm.isAccessible
 
 class PropertyState(
     private val xmlSerializer: XmlSerializer
@@ -14,29 +12,23 @@ class PropertyState(
         val properties = any::class.declaredMemberProperties
         properties.forEach { property ->
             property.isAccessible = true
-            println(property.valueParameters)
-            println((property.getter.call(any)?: "")::class.isSubclassOf(Number::class))
-            val value = property.getter.call(any) ?: return@forEach
-            xmlSerializer.xmlWriter.open(property.name)
 
-            if ((property.returnType.jvmErasure.isSubclassOf(Number::class)
-                        || property.returnType.jvmErasure.isSubclassOf(Boolean::class)
-                        || property.returnType.jvmErasure.isSubclassOf(Char::class)
-                        )
+            val value = property.getter.call(any) ?: return@forEach
+            println(value::class)
+            xmlSerializer.xmlWriter.open(property.name)
+            if (ReflectionUtils.isPrimitive(value::class)
             ) {
                 xmlSerializer.xmlWriter.write(value.toString())
-            }
-            else if(property.returnType.jvmErasure.isSubclassOf(String::class)) {
-                xmlSerializer.xmlWriter.write(
-                    value.toString()
-                        .replace("&", "&amp")
-                        .replace("<", "&lt")
-                        .replace(">", "&gt")
-                        .replace("\"", "&quot")
-                        .replace("'", "&apos")
-                )
-            }
-            else {
+            } else if (ReflectionUtils.isArray(value::class)) {
+                xmlSerializer.setState(ArrayState(xmlSerializer))
+                xmlSerializer.serialize(value)
+            } else if (ReflectionUtils.isMap(value::class)) {
+                xmlSerializer.setState(MapState(xmlSerializer))
+                xmlSerializer.serialize(value)
+            } else if (ReflectionUtils.isCollection(value::class)) {
+                xmlSerializer.setState(CollectionState(xmlSerializer))
+                xmlSerializer.serialize(value)
+            } else {
                 xmlSerializer.setState(ClassState(xmlSerializer))
                 xmlSerializer.serialize(value)
             }
@@ -46,3 +38,5 @@ class PropertyState(
 
 
 }
+
+

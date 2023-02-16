@@ -8,7 +8,7 @@ class XmlWriter {
     fun open(tag: String) {
         openTags.add(tag)
         stringBuilder.append("<")
-            .append(tag)
+            .append(tag.sanitize())
             .append(">")
     }
 
@@ -24,7 +24,9 @@ class XmlWriter {
     }
 
     fun write(value: String?) {
-        stringBuilder.append(value)
+        if (value == null)
+            return
+        stringBuilder.append(value.sanitize())
     }
 
     fun compile(): String {
