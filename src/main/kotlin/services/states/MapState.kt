@@ -1,6 +1,6 @@
 package services.states
 
-import services.ReflectionUtils
+import services.ReflectionUtils.writeTag
 import services.XmlSerializer
 
 class MapState(
@@ -9,23 +9,8 @@ class MapState(
     override fun serialize(any: Any) {
         val map = any as Map<*, *>
         map.forEach { (key, value) ->
-            xmlSerializer.xmlWriter.open("key")
-            if (ReflectionUtils.isPrimitive(key!!::class)) {
-                xmlSerializer.xmlWriter.write(key.toString())
-            } else {
-                xmlSerializer.setState(ClassState(xmlSerializer))
-                xmlSerializer.serialize(key)
-            }
-            xmlSerializer.xmlWriter.close("key")
-
-            xmlSerializer.xmlWriter.open("value")
-            if (ReflectionUtils.isPrimitive(value!!::class)) {
-                xmlSerializer.xmlWriter.write(value.toString())
-            } else {
-                xmlSerializer.setState(ClassState(xmlSerializer))
-                xmlSerializer.serialize(value)
-            }
-            xmlSerializer.xmlWriter.close("value")
+            xmlSerializer.writeTag("key", key!!)
+            xmlSerializer.writeTag("value", value!!)
         }
     }
 }

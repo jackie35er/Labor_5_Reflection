@@ -1,22 +1,15 @@
 package services.states
 
-import services.ReflectionUtils
+import services.ReflectionUtils.writeTag
 import services.XmlSerializer
 
 class CollectionState(
-    val xmlSerializer: XmlSerializer
+    private val xmlSerializer: XmlSerializer
 ) : XmlSerializerState {
     override fun serialize(any: Any) {
         any as Collection<*>
         any.forEach {
-            xmlSerializer.xmlWriter.open("value")
-            if (ReflectionUtils.isPrimitive(it!!::class)) {
-                xmlSerializer.xmlWriter.write(it.toString())
-            } else {
-                xmlSerializer.setState(ClassState(xmlSerializer))
-                xmlSerializer.serialize(it)
-            }
-            xmlSerializer.xmlWriter.close("value")
+            xmlSerializer.writeTag("value", it!!)
         }
 
 
